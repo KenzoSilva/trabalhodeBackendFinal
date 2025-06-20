@@ -1,0 +1,81 @@
+h1 class="text-3xl font-bold mb-6">Seu Carrinho/h1>
+
+{{
+#if
+ cart.products.length}}
+  div class="bg-white rounded-lg shadow-md overflow-hidden">
+    table class="min-w-full">
+      thead class="bg-gray-200">
+        tr>
+          th class="px-4 py-2 text-left">Produto/th>
+          th class="px-4 py-2 text-left">Preço/th>
+          th class="px-4 py-2 text-left">Quantidade/th>
+          th class="px-4 py-2 text-left">Total/th>
+          th class="px-4 py-2 text-left">Ações/th>
+        /tr>
+      /thead>
+      tbody>
+        {{
+#each
+ cart.products}}
+          tr class="border-b">
+            td class="px-4 py-2">{{this.product.name}}/td>
+            td class="px-4 py-2">R$ {{this.product.price}}/td>
+            td class="px-4 py-2">
+              input 
+                type="number" 
+                value="{{this.quantity}}" 
+                min="1" 
+                class="w-16 border rounded px-2 py-1"
+                onchange="updateQuantity('{{this.product._id}}', this.value)"
+              >
+            /td>
+            td class="px-4 py-2">R$ {{multiply this.product.price this.quantity}}/td>
+            td class="px-4 py-2">
+              button 
+                onclick="removeItem('{{this.product._id}}')" 
+                class="text-red-600 hover:text-red-800"
+              >
+                Remover
+              /button>
+            /td>
+          /tr>
+        {{
+/each
+}}
+      /tbody>
+    /table>
+  /div>
+
+  div class="mt-6 text-right">
+    p class="text-xl font-bold">Total: R$ {{calculateTotal cart.products}}/p>
+    button class="mt-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+      Finalizar Compra
+    /button>
+  /div>
+{{else}}
+  div class="text-center py-8">
+    p class="text-gray-500 text-lg">Seu carrinho está vazio./p>
+    a href="/products" class="text-blue-600 hover:underline mt-4 inline-block">
+      Ver produtos
+    /a>
+  /div>
+{{
+/if
+}}
+
+script>
+  async function updateQuantity(productId, quantity) {
+    await fetch(`/api/carts/items/${productId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    location.reload();
+  }
+
+  async function removeItem(productId) {
+    await fetch(`/api/carts/items/${productId}`, { method: 'DELETE' });
+    location.reload();
+  }
+/script>
